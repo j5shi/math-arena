@@ -1,12 +1,13 @@
 import datetime
-import tkinter as tk
-from tkinter import messagebox
-import random
 import json
 import os
+import random
+import tkinter as tk
+from tkinter import messagebox
 
 # 初始化用户数据文件
 USER_DATA_FILE = "user_data.json"
+
 
 # 加载用户数据
 def load_user_data():
@@ -15,10 +16,12 @@ def load_user_data():
             return json.load(f)
     return {}
 
+
 # 保存用户数据
 def save_user_data(data):
     with open(USER_DATA_FILE, 'w') as f:
         json.dump(data, f, indent=4)
+
 
 # 生成随机题目
 def generate_question(question_type):
@@ -30,6 +33,7 @@ def generate_question(question_type):
         num1 = random.randint(10, 99)
         num2 = random.randint(10, 99)
         return f"{num1} × {num2}", num1 * num2
+
 
 # 更新用户信息
 def update_user_info(username, test_type, score, questions, errors):
@@ -53,11 +57,11 @@ def update_user_info(username, test_type, score, questions, errors):
 
     save_user_data(user_data)
 
+
 # 主应用类
 class MathQuizApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("小学生数学练习工具")
+    def __init__(self, tkinter):
+        self.root = tkinter
 
         # 用户数据
         self.user_data = load_user_data()
@@ -72,6 +76,23 @@ class MathQuizApp:
         self.create_widgets()
 
     def create_widgets(self):
+        self.root.title("小学生数学练习工具")
+
+        # 设置窗口大小为
+        window_width = 800
+        window_height = 500
+
+        # 获取屏幕的宽度和高度
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        # 计算窗口左上角的坐标，使其居中
+        x = (screen_width // 2) - (window_width // 2)
+        y = (screen_height // 2) - (window_height // 2)
+
+        # 设置窗口大小和位置
+        self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
         # 用户名输入框
         self.username_label = tk.Label(self.root, text="请输入用户名:")
         self.username_label.pack(pady=5)
@@ -86,10 +107,14 @@ class MathQuizApp:
         self.question_type_label = tk.Label(self.root, text="请选择题目类型:")
         self.question_type_label.pack(pady=5)
 
-        self.division_button = tk.Button(self.root, text="除数是一位数的除法", command=lambda: self.start_quiz("division"))
+        self.division_button = tk.Button(self.root,
+                                         text="除数是一位数的除法",
+                                         command=lambda: self.start_quiz("division"))
         self.division_button.pack(pady=5)
 
-        self.multiplication_button = tk.Button(self.root, text="两位数乘两位数", command=lambda: self.start_quiz("multiplication"))
+        self.multiplication_button = tk.Button(self.root,
+                                               text="两位数乘两位数",
+                                               command=lambda: self.start_quiz("multiplication"))
         self.multiplication_button.pack(pady=5)
 
         # 答题区域
@@ -187,7 +212,8 @@ class MathQuizApp:
         total_questions = len(self.questions)
         total_errors = sum(1 for answer in self.answers if answer is None)
 
-        messagebox.showinfo("测验结束", f"本次测验结束！\n答对题数: {total_questions - total_errors}\n答错题数: {total_errors}\n总得分: {total_score}\n平均分: {total_score / total_questions:.2f}")
+        messagebox.showinfo("测验结束",
+                            f"本次测验结束！\n答对题数: {total_questions - total_errors}\n答错题数: {total_errors}\n总得分: {total_score}\n平均分: {total_score / total_questions:.2f}")
 
         # 更新用户数据
         update_user_info(self.current_username, self.test_type, total_score, total_questions, total_errors)
@@ -199,6 +225,7 @@ class MathQuizApp:
         self.current_question_index = 0
         self.question_label.config(text="")
         self.result_label.config(text="")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
