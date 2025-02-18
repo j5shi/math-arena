@@ -1,0 +1,13 @@
+{
+    "syz": {
+        "tests": [
+            {
+                "type": "division",
+                "score": 92,
+                "questions": 10,
+                "errors": 7,
+                "timestamp": "2025-02-18 12:09:22.745685"
+            }
+        ]
+    }
+}
