@@ -26,7 +26,29 @@ def save_user_data(data):
 
 # 生成随机题目
 def generate_question(question_type):
-    if question_type == QuestionType.DEVISION_LEVEL_1.value:
+    if question_type == QuestionType.ADDITION_LEVEL_1.value:
+        num1 = random.randint(10, 99)
+        num2 = random.randint(10, 99)
+        return f"{num1} + {num2}", num1 + num2
+
+    elif question_type == QuestionType.ADDITION_LEVEL_2.value:
+        num1 = random.randint(100, 999)
+        num2 = random.randint(100, 999)
+        return f"{num1} + {num2}", num1 + num2
+
+    elif question_type == QuestionType.SUBTRACTION_LEVEL_1.value:
+        num1 = random.randint(10, 99)
+        num2 = random.randint(1, 9)
+        return f"{num1} - {num2}", num1 - num2
+
+    elif question_type == QuestionType.SUBTRACTION_LEVEL_2.value:
+        while True:
+            num1 = random.randint(10, 99)
+            num2 = random.randint(10, 99)
+            if num1 > num2:
+                return f"{num1} - {num2}", num1 - num2
+
+    elif question_type == QuestionType.DEVISION_LEVEL_1.value:
         while True:
             divisor = random.randint(1, 9)
             dividend = random.randint(2, 99)
@@ -49,6 +71,9 @@ def generate_question(question_type):
         num1 = random.randint(10, 99)
         num2 = random.randint(10, 99)
         return f"{num1} × {num2}", num1 * num2
+
+    else:
+        raise ValueError(f"Invalid question type: {question_type}")
 
 
 # 更新用户信息
@@ -75,6 +100,10 @@ def update_user_info(username, test_type, score, questions, errors):
 
 
 class QuestionType(Enum):
+    ADDITION_LEVEL_1 = "两位数加法"
+    ADDITION_LEVEL_2 = "三位数加法"
+    SUBTRACTION_LEVEL_1 = "两位数减一位数"
+    SUBTRACTION_LEVEL_2 = "两位数减两位数"
     DEVISION_LEVEL_1 = "两位数除一位数的整除法"
     DEVISION_LEVEL_2 = "两位数除一位数的非整除法"
     MULTIPLICATION_LEVEL_1 = "两位数乘一位数"
@@ -116,7 +145,7 @@ class MathQuizApp:
 
         # 设置窗口大小为
         window_width = 600
-        window_height = 400
+        window_height = 450
 
         # 获取屏幕的宽度和高度
         screen_width = self.root.winfo_screenwidth()
@@ -149,15 +178,52 @@ class MathQuizApp:
                                               command=self.save_username)
         self.save_username_button.pack(side=tk.LEFT, padx=5, pady=5)
 
+        # 题目类型选择按钮宽度
+        question_button_width = 20
+
+        # 题目类型选择标签
+        self.question_type_label = tk.Label(self.root, text="请选择题目类型:", bg=self.background_color)
+        self.question_type_label.pack(pady=5)
+
         # 创建一个框架来放置题目按钮
         self.questions_frame1 = tk.Frame(self.root, bg=self.background_color)
         self.questions_frame1.pack(padx=5, pady=5)
 
-        # 题目类型选择
-        question_button_width = 20
+        self.divisible_button = tk.Button(self.questions_frame1,
+                                          text=QuestionType.ADDITION_LEVEL_1.value,
+                                          command=lambda: self.start_quiz(QuestionType.ADDITION_LEVEL_1.value),
+                                          bg=self.background_color,
+                                          width=question_button_width)
+        self.divisible_button.pack(side=tk.LEFT, pady=5)
 
-        self.question_type_label = tk.Label(self.questions_frame1, text="请选择题目类型:", bg=self.background_color)
-        self.question_type_label.pack(pady=5)
+        self.divisible_button = tk.Button(self.questions_frame1,
+                                          text=QuestionType.ADDITION_LEVEL_2.value,
+                                          command=lambda: self.start_quiz(QuestionType.ADDITION_LEVEL_2.value),
+                                          bg=self.background_color,
+                                          width=question_button_width)
+        self.divisible_button.pack(side=tk.RIGHT, pady=5)
+
+        # 创建一个框架来放置题目按钮
+        self.questions_frame1 = tk.Frame(self.root, bg=self.background_color)
+        self.questions_frame1.pack(padx=5, pady=5)
+
+        self.divisible_button = tk.Button(self.questions_frame1,
+                                          text=QuestionType.SUBTRACTION_LEVEL_1.value,
+                                          command=lambda: self.start_quiz(QuestionType.SUBTRACTION_LEVEL_1.value),
+                                          bg=self.background_color,
+                                          width=question_button_width)
+        self.divisible_button.pack(side=tk.LEFT, pady=5)
+
+        self.divisible_button = tk.Button(self.questions_frame1,
+                                          text=QuestionType.SUBTRACTION_LEVEL_2.value,
+                                          command=lambda: self.start_quiz(QuestionType.SUBTRACTION_LEVEL_2.value),
+                                          bg=self.background_color,
+                                          width=question_button_width)
+        self.divisible_button.pack(side=tk.RIGHT, pady=5)
+
+        # 创建一个框架来放置题目按钮
+        self.questions_frame1 = tk.Frame(self.root, bg=self.background_color)
+        self.questions_frame1.pack(padx=5, pady=5)
 
         self.divisible_button = tk.Button(self.questions_frame1,
                                           text=QuestionType.DEVISION_LEVEL_1.value,
@@ -260,6 +326,8 @@ class MathQuizApp:
         if user_answer == correct_answer:
             messagebox.showinfo("正确", "回答正确！")
             self.answers[self.current_question_index] = user_answer
+            # 显示下一题
+            self.current_question_index += 1
             self.show_question()
         else:
             self.scores[self.current_question_index] -= 2
