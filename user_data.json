@@ -1,15 +1,4 @@
 {
-    "syz": {
-        "tests": [
-            {
-                "type": "division",
-                "score": 92,
-                "questions": 10,
-                "errors": 7,
-                "timestamp": "2025-02-18 12:09:22.745685"
-            }
-        ]
-    },
     "\u65bd\u96e8\u6cfd": {
         "tests": [
             {
@@ -20,19 +9,5 @@
                 "timestamp": "2025-02-18 21:10:50.566494"
             }
         ]
-    },
-    "abc": {
-        "tests": [
-            {
-                "type": "division",
-                "score": 100,
-                "questions": 10,
-                "errors": 5,
-                "timestamp": "2025-02-18 21:13:06.653557"
-            }
-        ]
-    },
-    "asd": {
-        "tests": []
     }
 }

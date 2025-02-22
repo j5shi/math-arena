@@ -3,6 +3,7 @@ import json
 import os
 import random
 import tkinter as tk
+from enum import Enum
 from tkinter import messagebox
 
 # 初始化用户数据文件
@@ -25,11 +26,26 @@ def save_user_data(data):
 
 # 生成随机题目
 def generate_question(question_type):
-    if question_type == "division":
-        divisor = random.randint(1, 9)
-        dividend = random.randint(10, 99)
-        return f"{dividend} ÷ {divisor}", dividend // divisor
-    elif question_type == "multiplication":
+    if question_type == QuestionType.DEVISION_LEVEL_1.value:
+        while True:
+            divisor = random.randint(1, 9)
+            dividend = random.randint(2, 99)
+            if dividend % divisor == 0:
+                return f"{dividend} ÷ {divisor}", dividend // divisor
+
+    elif question_type == QuestionType.DEVISION_LEVEL_2.value:
+        while True:
+            divisor = random.randint(1, 9)
+            dividend = random.randint(2, 99)
+            if dividend % divisor != 0:
+                return f"{dividend} ÷ {divisor}", dividend // divisor
+
+    elif question_type == QuestionType.MULTIPLICATION_LEVEL_1.value:
+        num1 = random.randint(10, 99)
+        num2 = random.randint(1, 9)
+        return f"{num1} × {num2}", num1 * num2
+
+    elif question_type == QuestionType.MULTIPLICATION_LEVEL_2.value:
         num1 = random.randint(10, 99)
         num2 = random.randint(10, 99)
         return f"{num1} × {num2}", num1 * num2
@@ -58,8 +74,20 @@ def update_user_info(username, test_type, score, questions, errors):
     save_user_data(user_data)
 
 
+class QuestionType(Enum):
+    DEVISION_LEVEL_1 = "两位数除一位数的整除法"
+    DEVISION_LEVEL_2 = "两位数除一位数的非整除法"
+    MULTIPLICATION_LEVEL_1 = "两位数乘一位数"
+    MULTIPLICATION_LEVEL_2 = "两位数乘两位数"
+
+
 # 主应用类
 class MathQuizApp:
+    question_types = {
+        "division": "除数是一位数的整除法",
+        "multiplication": "两位数乘两位数"
+    }
+
     def __init__(self, tkinter):
         self.root = tkinter
 
@@ -72,15 +100,23 @@ class MathQuizApp:
         self.current_question_index = 0
         self.test_type = None
 
+        # 默认使用第一个用户
+        if len(self.user_data):
+            self.current_username = list(self.user_data.keys())[0]
+
         # 创建界面
         self.create_widgets()
 
     def create_widgets(self):
-        self.root.title("小学生数学练习工具")
+        self.root.title("小学生数学强化练习工具")
+
+        # 可以更改背景颜色
+        self.background_color = None
+        self.root.configure(bg=self.background_color)
 
         # 设置窗口大小为
-        window_width = 800
-        window_height = 500
+        window_width = 600
+        window_height = 400
 
         # 获取屏幕的宽度和高度
         screen_width = self.root.winfo_screenwidth()
@@ -93,51 +129,89 @@ class MathQuizApp:
         # 设置窗口大小和位置
         self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
+        # 创建一个框架来放置用户名标签和输入框
+        self.username_frame = tk.Frame(self.root, bg=self.background_color)
+        self.username_frame.pack(padx=5, pady=5)
+
+        # 用户名标签
+        self.username_label = tk.Label(self.username_frame, text="请输入用户名:", bg=self.background_color)
+        self.username_label.pack(side=tk.LEFT, padx=5, pady=5)
+
         # 用户名输入框
-        self.username_label = tk.Label(self.root, text="请输入用户名:")
-        self.username_label.pack(pady=5)
+        self.username_entry = tk.Entry(self.username_frame, bg=self.background_color)
+        if self.current_username:
+            self.username_entry.insert(0, self.current_username)
+        self.username_entry.pack(side=tk.LEFT, padx=5, pady=5)
 
-        self.username_entry = tk.Entry(self.root)
-        self.username_entry.pack(pady=5)
+        self.save_username_button = tk.Button(self.username_frame,
+                                              text="保存或修改用户名",
+                                              bg=self.background_color,
+                                              command=self.save_username)
+        self.save_username_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-        self.save_username_button = tk.Button(self.root, text="保存用户名", command=self.save_username)
-        self.save_username_button.pack(pady=5)
+        # 创建一个框架来放置题目按钮
+        self.questions_frame1 = tk.Frame(self.root, bg=self.background_color)
+        self.questions_frame1.pack(padx=5, pady=5)
 
         # 题目类型选择
-        self.question_type_label = tk.Label(self.root, text="请选择题目类型:")
+        question_button_width = 20
+
+        self.question_type_label = tk.Label(self.questions_frame1, text="请选择题目类型:", bg=self.background_color)
         self.question_type_label.pack(pady=5)
 
-        self.division_button = tk.Button(self.root,
-                                         text="除数是一位数的除法",
-                                         command=lambda: self.start_quiz("division"))
-        self.division_button.pack(pady=5)
+        self.divisible_button = tk.Button(self.questions_frame1,
+                                          text=QuestionType.DEVISION_LEVEL_1.value,
+                                          command=lambda: self.start_quiz(QuestionType.DEVISION_LEVEL_1.value),
+                                          bg=self.background_color,
+                                          width=question_button_width)
+        self.divisible_button.pack(side=tk.LEFT, pady=5)
 
-        self.multiplication_button = tk.Button(self.root,
-                                               text="两位数乘两位数",
-                                               command=lambda: self.start_quiz("multiplication"))
-        self.multiplication_button.pack(pady=5)
+        self.divisible_button = tk.Button(self.questions_frame1,
+                                          text=QuestionType.DEVISION_LEVEL_2.value,
+                                          command=lambda: self.start_quiz(QuestionType.DEVISION_LEVEL_2.value),
+                                          bg=self.background_color,
+                                          width=question_button_width)
+        self.divisible_button.pack(side=tk.RIGHT, pady=5)
+
+        # 创建一个框架来放置题目按钮
+        self.questions_frame2 = tk.Frame(self.root, bg=self.background_color)
+        self.questions_frame2.pack(padx=5, pady=5)
+
+        self.multiplication_button = tk.Button(self.questions_frame2,
+                                               text=QuestionType.MULTIPLICATION_LEVEL_1.value,
+                                               command=lambda: self.start_quiz(QuestionType.MULTIPLICATION_LEVEL_1.value),
+                                               bg=self.background_color,
+                                               width=question_button_width)
+        self.multiplication_button.pack(side=tk.LEFT, pady=5)
+
+        self.multiplication_button = tk.Button(self.questions_frame2,
+                                               text=QuestionType.MULTIPLICATION_LEVEL_2.value,
+                                               command=lambda: self.start_quiz(QuestionType.MULTIPLICATION_LEVEL_2.value),
+                                               bg=self.background_color,
+                                               width=question_button_width)
+        self.multiplication_button.pack(side=tk.RIGHT, pady=5)
 
         # 答题区域
-        self.question_label = tk.Label(self.root, text="")
+        self.question_label = tk.Label(self.root, text="", bg=self.background_color)
         self.question_label.pack(pady=10)
 
-        self.answer_entry = tk.Entry(self.root)
+        self.answer_entry = tk.Entry(self.root, bg=self.background_color)
         self.answer_entry.pack(pady=5)
 
-        self.confirm_button = tk.Button(self.root, text="确认", command=self.check_answer)
+        self.confirm_button = tk.Button(self.root, text="确认", command=self.check_answer, bg=self.background_color)
         self.confirm_button.pack(pady=5)
 
-        self.prev_button = tk.Button(self.root, text="上一题", command=self.prev_question)
+        self.prev_button = tk.Button(self.root, text="上一题", command=self.prev_question, bg=self.background_color)
         self.prev_button.pack(side=tk.LEFT, padx=10)
 
-        self.next_button = tk.Button(self.root, text="下一题", command=self.next_question)
+        self.next_button = tk.Button(self.root, text="下一题", command=self.next_question, bg=self.background_color)
         self.next_button.pack(side=tk.RIGHT, padx=10)
 
-        self.end_test_button = tk.Button(self.root, text="结束测验", command=self.end_test)
+        self.end_test_button = tk.Button(self.root, text="结束测验", command=self.end_test, bg=self.background_color)
         self.end_test_button.pack(pady=10)
 
         # 测验结果显示
-        self.result_label = tk.Label(self.root, text="")
+        self.result_label = tk.Label(self.root, text="", bg=self.background_color)
         self.result_label.pack(pady=10)
 
     def save_username(self):
