@@ -16,7 +16,6 @@ def load_user_data():
         with open(USER_DATA_FILE, 'r', encoding='utf-8') as f:
             content = f.read()
             if content:
-                print(content)
                 return json.loads(content)
             else:
                 return {}
