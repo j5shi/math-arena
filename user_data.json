@@ -1,12 +1,29 @@
 {
-    "\u65bd\u96e8\u6cfd": {
+    "Joe": {
         "tests": [
             {
-                "type": "division",
-                "score": 96,
+                "type": "\u4e24\u4f4d\u6570\u52a0\u6cd5",
+                "score": 0,
                 "questions": 10,
-                "errors": 4,
-                "timestamp": "2025-02-18 21:10:50.566494"
+                "corrects": 0,
+                "errors": 0,
+                "timestamp": "2025-03-03 20:23:35.888909"
+            },
+            {
+                "type": "\u4e24\u4f4d\u6570\u52a0\u6cd5",
+                "score": 0,
+                "questions": 0,
+                "corrects": 0,
+                "errors": 0,
+                "timestamp": "2025-03-03 20:23:45.554156"
+            },
+            {
+                "type": "\u4e24\u4f4d\u6570\u52a0\u6cd5",
+                "score": 0,
+                "questions": 10,
+                "corrects": 0,
+                "errors": 0,
+                "timestamp": "2025-03-03 20:27:20.108727"
             }
         ]
     }
